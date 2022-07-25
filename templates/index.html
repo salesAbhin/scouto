@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Working with Flask and SocketIO</title>
+</head>
+
+<body>
+	<div>
+		<div>
+			<button id="numberOfClients" type="button">CLIENT COUNT</button>
+		</div>
+		<div id="clients"></div>
+	</div>
+	<div>
+		<div>
+		<button id="serverTime" type="button">GET SERVER TIME</button>
+		</div>
+		<div id="time"></div>
+	</div>
+	<div>
+		<div>
+		<button id="connectedFrom" type="button">CONNECTED FROM</button>
+		</div>
+		<div id="connTime"></div>
+	</div>
+	</div>
+
+<div id="serverHearbeat">
+	<div id="heartbeat">
+
+	</div>
+</div>
+	
+ <div id="logger">
+	
+ </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script>
+	  var socket = null;
+	 var connectionEstablishedat
+	  $('#numberOfClients').click(()=>{
+		  console.log('getting client count')
+		  socket.emit('client count','')
+	  })
+	  $('#serverTime').click(()=>{
+		  console.log('getting server time')
+		  socket.emit('server time','')
+	  })
+	  $('#connectedFrom').click(()=>{
+		  console.log('getting connection creation time')
+		  var loggerElement = document.getElementById('connTime')
+		  console.log('conntime ', connectionEstablishedat)
+          loggerElement.textContent = connectionEstablishedat
+	  })
+	  $( document ).ready(function() {
+    	console.log( "ready!" );
+		socket = io()
+		socket.on('connect',(data)=>{
+			console.log('connection established', socket)
+			connectionEstablishedat = $.now()
+		})
+      	var loggerElement = document.getElementById('logger')
+		socket.on('log', function(payload) {
+        console.log(payload);
+        var dataElement = document.createElement('pre')
+        dataElement.innerHTML = payload.data
+        loggerElement.appendChild(dataElement)
+	      })
+		
+		socket.on('client count is',(data)=>{
+		var loggerElement = document.getElementById('clients')
+        loggerElement.textContent = data.data
+		console.log('client count is ', data)
+		})
+		socket.on('server time is',(data)=>{
+		var loggerElement = document.getElementById('time')
+        loggerElement.textContent = data.data
+			console.log('server time is ', data)
+		})
+		socket.on('ping',(data)=>{
+			console.log('ping receieved')
+		var loggerElement = document.getElementById('heartbeat')
+		var dataElement = document.createElement('pre')
+        dataElement.innerHTML = "Connected " + $.now()
+        loggerElement.appendChild(dataElement)
+		})
+
+	});
+  </script>
+</body>
